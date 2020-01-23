@@ -160,9 +160,15 @@ public:
         }
     }
     int char2Int(char c) {
+        if (c == '^') {
+            return 0;
+        }
         return (c - 'a') + 1;
     }
     char int2Char(int color) {
+        if (color == 94) {
+            return '^';
+        }
         return (color + 'a') - 1;
     }
     State findStart() {
@@ -188,45 +194,69 @@ public:
         return false;
     }
     bool checkNorth(State current) {
+        if (current.row == 0) {
+            return false;
+        }
         char north = puzzle[current.row - 1][current.col];
-        if (current.row == 0 || (!isValidCharacter(north))) {
+        if (!isValidCharacter(north)) {
             return false;
         }
         if ((char2Int(north) > 64 && char2Int(north) < 91) && char2Int(north) 
             + 32 == char2Int(current.color)) {
             return true;
         }
+        if (north == '?' || north == '.' || north == '@') {
+            return true;
+        }
         return false;
     }
     bool checkEast(State current) {
+        if (current.col == width - 1) {
+            return false;
+        }
         char east = puzzle[current.row][current.col + 1];
-        if (current.col == width - 1 || (!isValidCharacter(east))) {
+        if (!isValidCharacter(east)) {
             return false;
         }
         if ((char2Int(east) > 64 && char2Int(east) < 91) && char2Int(east)
             + 32 == char2Int(current.color)) {
             return true;
         }
+        if (east == '?' || east == '.' || east== '@') {
+            return true;
+        }
         return false;
     }
     bool checkSouth(State current) {
+        if (current.row == height - 1) {
+            return false;
+        }
         char south = puzzle[current.row + 1][current.col];
-        if (current.col == height - 1 || (!isValidCharacter(south))) {
+        if (!isValidCharacter(south)) {
             return false;
         }
         if ((char2Int(south) > 64 && char2Int(south) < 91) && char2Int(south)
             + 32 == char2Int(current.color)) {
             return true;
         }
+        if (south == '?' || south == '.' || south == '@') {
+            return true;
+        }
         return false;
     }
     bool checkWest(State current) {
+        if (current.col == 0) {
+            return false;
+        }
         char west = puzzle[current.row][current.col - 1];
-        if (current.col == width - 1 || (!isValidCharacter(west))) {
+        if (!isValidCharacter(west)) {
             return false;
         }
         if ((char2Int(west) > 64 && char2Int(west) < 91) && char2Int(west)
             + 32 == char2Int(current.color)) {
+            return true;
+        }
+        if (west == '?' || west == '.' || west == '@') {
             return true;
         }
         return false;
@@ -242,6 +272,8 @@ public:
             temp.row = current.row - 1;
             temp.color = current.color;
             reachable.push_back(temp);
+            backtrack[current.col][current.row - 1][char2Int(current.color)] =
+                'S';
             if (findQuestionMark(puzzle[current.col][current.row - 1])) {
                 end = true;
                 return;
@@ -252,6 +284,8 @@ public:
             temp.row = current.row;
             temp.color = current.color;
             reachable.push_back(temp);
+            backtrack[current.col + 1][current.row][char2Int(current.color)] =
+                'W';
             if (findQuestionMark(puzzle[current.col + 1][current.row])) {
                 end = true;
                 return;
@@ -259,9 +293,11 @@ public:
         }
         if (checkSouth(current)) {
             temp.col = current.col;
-            temp.row = current.row + 1;
+            temp.row = current.row - 1;
             temp.color = current.color;
             reachable.push_back(temp);
+            backtrack[current.col][current.row + 1][char2Int(current.color)] =
+                'N';
             if (findQuestionMark(puzzle[current.col][current.row + 1])) {
                 end = true;
                 return;
@@ -272,6 +308,8 @@ public:
             temp.row = current.row;
             temp.color = current.color;
             reachable.push_back(temp);
+            backtrack[current.col - 1][current.row][char2Int(current.color)] =
+                'E';
             if (findQuestionMark(puzzle[current.col - 1][current.row])) {
                 end = true;
                 return;

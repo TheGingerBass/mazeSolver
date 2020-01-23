@@ -10,7 +10,7 @@ int main(int argc, char * argv[]) {
     s.readInput();
     s.print2DVector();
     s.solutionFinder();
-    s.writeOutput();
+    //s.writeOutput();
     return 0;
 }
 
