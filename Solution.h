@@ -27,6 +27,11 @@ private:
     vector < vector < vector <char>>> backtrack;
     deque<State> reachable;
 public:
+    /*Solution(int color_in, int height_in, int width_in) {
+        colors = color_in;
+        height = height_in;
+        width = width_in;
+    }*/
     void printHelp(char * argv[]) { // TODO: this is copy pasted from project 0, update to have right info
         cout << "Usage: " << argv[0] << " -h|-q|-s|[-o map|list]\n";
         cout << "This program is to find if there is a solution to a\n";
@@ -121,9 +126,16 @@ public:
         cin >> width;
         cin >> height; // Reads in first three ints
         inputCheck();
+        vector < vector < vector <char>>> backtrack1(colors, vector<vector<char>>(height, vector<char>(width, '.')));
+        backtrack = backtrack1;
         puzzle.resize(height, vector<char>(width, '.'));
-        backtrack.resize(height, vector<vector<char>>(width,
-            vector<char>(colors, '.')));
+        //backtrack.resize(colors, vector<vector<char>>(height, vector<char>(width, '.')));
+
+
+        
+
+
+
         vector <char> row(width);
         char symbol_in;
         cin >> symbol_in;
@@ -272,7 +284,7 @@ public:
             temp.row = current.row - 1;
             temp.color = current.color;
             reachable.push_back(temp);
-            backtrack[current.col][current.row - 1][char2Int(current.color)] =
+            backtrack[char2Int(current.color)][current.row - 1][current.col] =
                 'S';
             if (findQuestionMark(puzzle[current.col][current.row - 1])) {
                 end = true;
@@ -284,7 +296,7 @@ public:
             temp.row = current.row;
             temp.color = current.color;
             reachable.push_back(temp);
-            backtrack[current.col + 1][current.row][char2Int(current.color)] =
+            backtrack[char2Int(current.color)][current.row][current.col + 1] =
                 'W';
             if (findQuestionMark(puzzle[current.col + 1][current.row])) {
                 end = true;
@@ -296,7 +308,7 @@ public:
             temp.row = current.row - 1;
             temp.color = current.color;
             reachable.push_back(temp);
-            backtrack[current.col][current.row + 1][char2Int(current.color)] =
+            backtrack[char2Int(current.color)][current.row + 1][current.col] =
                 'N';
             if (findQuestionMark(puzzle[current.col][current.row + 1])) {
                 end = true;
@@ -308,7 +320,7 @@ public:
             temp.row = current.row;
             temp.color = current.color;
             reachable.push_back(temp);
-            backtrack[current.col - 1][current.row][char2Int(current.color)] =
+            backtrack[char2Int(current.color)][current.row][current.col - 1] =
                 'E';
             if (findQuestionMark(puzzle[current.col - 1][current.row])) {
                 end = true;
