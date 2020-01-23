@@ -1,0 +1,7 @@
+﻿  project1.cpp
+c:\eecs281\project1\project1\solution.h(60): warning C4018: '<': signed/unsigned mismatch
+c:\eecs281\project1\project1\solution.h(68): warning C4018: '<': signed/unsigned mismatch
+c:\eecs281\project1\project1\solution.h(69): warning C4018: '<': signed/unsigned mismatch
+c:\eecs281\project1\project1\solution.h(93): warning C4018: '<': signed/unsigned mismatch
+c:\eecs281\project1\project1\solution.h(94): warning C4018: '<': signed/unsigned mismatch
+  Project1.vcxproj -> C:\EECS281\project1\Project1\x64\Debug\Project1.exe
