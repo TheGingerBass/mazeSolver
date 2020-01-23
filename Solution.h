@@ -121,21 +121,23 @@ public:
         string junk;
         getline(cin, junk);
     }
+    void resize2dVec(vector<vector<int>> &vec, int rows, int cols)
+    {
+        vec.resize(rows);
+        for (auto &it : vec)
+        {
+            it.resize(cols);
+        }
+    }
     void readInput() {
         cin >> colors;
-        cin >> width;
-        cin >> height; // Reads in first three ints
+        cin >> height;
+        cin >> width; // Reads in first three ints
         inputCheck();
-        vector < vector < vector <char>>> backtrack1(colors, vector<vector<char>>(height, vector<char>(width, '.')));
-        backtrack = backtrack1;
         puzzle.resize(height, vector<char>(width, '.'));
-        //backtrack.resize(colors, vector<vector<char>>(height, vector<char>(width, '.')));
 
-
+        backtrack.resize(colors + 1, vector<vector<char>>(height, vector<char>(width, '.')));
         
-
-
-
         vector <char> row(width);
         char symbol_in;
         cin >> symbol_in;
@@ -199,8 +201,8 @@ public:
     bool isValidCharacter(char current) {
         if (current == '.' || current == '?' || current == '#' || 
             current == '^' ||
-            (char2Int(current) > 64 && char2Int(current) < 91) ||
-            (char2Int(current) > 96 && char2Int(current) < 123)) {
+            (char2Int(current) > 0 && char2Int(current) < 27) ||
+            (char2Int(current) > -32 && char2Int(current) < -5)) {
             return true;
         }
         return false;
@@ -213,11 +215,19 @@ public:
         if (!isValidCharacter(north)) {
             return false;
         }
-        if ((char2Int(north) > 64 && char2Int(north) < 91) && char2Int(north) 
-            + 32 == char2Int(current.color)) {
+        if ((char2Int(north) > 0 && char2Int(north) < 27 || (char2Int(north)
+        > -32 && char2Int(north) < -5)) && (char2Int(north) - 32 == 
+            char2Int(current.color)) || char2Int(north) - 32 ==
+            char2Int(current.color)) {
+            if (backtrack[char2Int(current.color)][current.row - 1][current.col] != '.') {
+                return false;
+            }
             return true;
         }
         if (north == '?' || north == '.' || north == '@') {
+            if (backtrack[char2Int(current.color)][current.row - 1][current.col] != '.') {
+                return false;
+            }
             return true;
         }
         return false;
@@ -230,11 +240,19 @@ public:
         if (!isValidCharacter(east)) {
             return false;
         }
-        if ((char2Int(east) > 64 && char2Int(east) < 91) && char2Int(east)
-            + 32 == char2Int(current.color)) {
+        if ((char2Int(east) > 0 && char2Int(east) < 27 || (char2Int(east)
+        > -32 && char2Int(east) < -5)) && (char2Int(east) - 32 == 
+            char2Int(current.color) || char2Int(east) - 32 ==
+            char2Int(current.color))) {
+            if (backtrack[char2Int(current.color)][current.row][current.col + 1] != '.') {
+                return false;
+            }
             return true;
         }
         if (east == '?' || east == '.' || east== '@') {
+            if (backtrack[char2Int(current.color)][current.row][current.col + 1] != '.') {
+                return false;
+            }
             return true;
         }
         return false;
@@ -247,11 +265,19 @@ public:
         if (!isValidCharacter(south)) {
             return false;
         }
-        if ((char2Int(south) > 64 && char2Int(south) < 91) && char2Int(south)
-            + 32 == char2Int(current.color)) {
+        if (((char2Int(south) > 0 && char2Int(south) < 27) || (char2Int(south) 
+        > -32 && char2Int(south) < -5)) && (char2Int(south) - 32 == 
+            char2Int(current.color) || char2Int(south) + 32 ==
+            char2Int(current.color))) {
+            if (backtrack[char2Int(current.color)][current.row + 1][current.col] != '.') {
+                return false;
+            }
             return true;
         }
         if (south == '?' || south == '.' || south == '@') {
+            if (backtrack[char2Int(current.color)][current.row + 1][current.col] != '.') {
+                return false;
+            }
             return true;
         }
         return false;
@@ -264,11 +290,19 @@ public:
         if (!isValidCharacter(west)) {
             return false;
         }
-        if ((char2Int(west) > 64 && char2Int(west) < 91) && char2Int(west)
-            + 32 == char2Int(current.color)) {
+        if ((char2Int(west) > 0 && char2Int(west) < 27 || (char2Int(west)
+        > -32 && char2Int(west) < -5)) && (char2Int(west) - 32 != 
+            char2Int(current.color) || char2Int(west) + 32 ==
+            char2Int(current.color))) {
+            if (backtrack[char2Int(current.color)][current.row][current.col - 1] != '.') {
+                return false;
+            }
             return true;
         }
         if (west == '?' || west == '.' || west == '@') {
+            if (backtrack[char2Int(current.color)][current.row][current.col - 1] != '.') {
+                return false;
+            }
             return true;
         }
         return false;
@@ -286,7 +320,7 @@ public:
             reachable.push_back(temp);
             backtrack[char2Int(current.color)][current.row - 1][current.col] =
                 'S';
-            if (findQuestionMark(puzzle[current.col][current.row - 1])) {
+            if (findQuestionMark(puzzle[current.row - 1][current.col])) {
                 end = true;
                 return;
             }
@@ -298,19 +332,19 @@ public:
             reachable.push_back(temp);
             backtrack[char2Int(current.color)][current.row][current.col + 1] =
                 'W';
-            if (findQuestionMark(puzzle[current.col + 1][current.row])) {
+            if (findQuestionMark(puzzle[current.row][current.col + 1])) {
                 end = true;
                 return;
             }
         }
         if (checkSouth(current)) {
             temp.col = current.col;
-            temp.row = current.row - 1;
+            temp.row = current.row + 1;
             temp.color = current.color;
             reachable.push_back(temp);
             backtrack[char2Int(current.color)][current.row + 1][current.col] =
                 'N';
-            if (findQuestionMark(puzzle[current.col][current.row + 1])) {
+            if (findQuestionMark(puzzle[current.row + 1][current.col])) {
                 end = true;
                 return;
             }
@@ -322,22 +356,22 @@ public:
             reachable.push_back(temp);
             backtrack[char2Int(current.color)][current.row][current.col - 1] =
                 'E';
-            if (findQuestionMark(puzzle[current.col - 1][current.row])) {
+            if (findQuestionMark(puzzle[current.row][current.col - 1])) {
                 end = true;
                 return;
             }
         }
     }
     bool isLetter(char spot) {
-        if (char2Int(spot) > 96 && char2Int(spot) < 123) {
+        if (char2Int(spot) > 0 && char2Int(spot) < 27) {
             return true;
         }
         return false;
     }
     bool isButton(State current) {
-        if ((isLetter(puzzle[current.col][current.row]) || 
-            puzzle[current.col][current.row] == '^') &&
-            puzzle[current.col][current.row] != current.color) {
+        if ((isLetter(puzzle[current.row][current.col]) || 
+            puzzle[current.row][current.col] == '^') &&
+            puzzle[current.row][current.col] != current.color) {
             return true;
         }
         return false;
@@ -359,12 +393,17 @@ public:
         while (!reachable.empty()) {
             if (!end) {
                 current = reachable.front();
-                reachable.pop_front();
+                if (mode == "queue") {
+                    reachable.pop_front();
+                }
+                reachable.pop_back();
                 if (isButton(current) && !findInReachable(current)) {
-                    tempState.color = puzzle[width][height];
+                    tempState.color = puzzle[current.row][current.col];
                     tempState.col = current.col;
                     tempState.row = current.row;
                     reachable.push_back(tempState);
+                    backtrack[char2Int(tempState.color)][current.row][current.col] 
+                        = tempState.color;
                 }
                 checkDirectionAndPush(current);
             }
