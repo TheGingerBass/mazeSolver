@@ -6,6 +6,7 @@
 #include <deque>
 #include <vector>
 #include <stack>
+#include <getopt.h>
 using namespace std;
 
 struct State {
@@ -16,7 +17,8 @@ struct State {
 
 class Solution {
 private:
-    string solution = "";
+    string mode = "";
+    string type = "";
     unsigned int colors = 0;
     unsigned int height = 0;
     unsigned int width = 0;
@@ -35,8 +37,6 @@ public:
     // when the user specifies the -m/--mode option.
     string getoptPrep(int argc, char * argv[]) {
         bool modeSpecified = false;
-        string mode;
-        string type;
         // These are used with getopt_long()
         opterr = true; // Give us help with errors
         int choice;
@@ -304,15 +304,25 @@ public:
     }
     void solutionFinder() {
         State current = findStart();
+        State tempState;
         reachable.push_back(current);
         while (!reachable.empty()) {
-            current = reachable.front();
-            reachable.pop_front();
-            if (isButton(current) && !findInReachable(current)) {
-
+            if (!end) {
+                current = reachable.front();
+                reachable.pop_front();
+                if (isButton(current) && !findInReachable(current)) {
+                    tempState.color = puzzle[width][height];
+                    tempState.col = current.col;
+                    tempState.row = current.row;
+                    reachable.push_back(tempState);
+                }
+                checkDirectionAndPush(current);
+            }
+            else {
+                break;
             }
         }
-
+        // do stuff
         
     }
     ///////////////////////////////////////////////////////////////////////////
