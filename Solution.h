@@ -20,11 +20,88 @@ private:
     unsigned int colors = 0;
     unsigned int height = 0;
     unsigned int width = 0;
-    bool start = false;
     bool end = false;
     vector < vector<char>> puzzle;
     vector < vector < vector <char>>> backtrack;
+    deque<State> reachable;
 public:
+    void printHelp(char * argv[]) { // TODO: this is copy pasted from project 0, update to have right info
+        cout << "Usage: " << argv[0] << " -h|-q|-s|[-o map|list]\n";
+        cout << "This program is to find if there is a solution to a\n";
+        cout << "given puzzle, recording the solution if there is one,\n";
+        cout << "and letting the user know if there is no solution.\n";
+    } // printHelp()
+    // Process the command line; the only thing we need to return is the mode
+    // when the user specifies the -m/--mode option.
+    string getoptPrep(int argc, char * argv[]) {
+        bool modeSpecified = false;
+        string mode;
+        string type;
+        // These are used with getopt_long()
+        opterr = true; // Give us help with errors
+        int choice;
+        int option_index = 0;
+        option long_options[] = {
+            { "help", no_argument,         nullptr, 'h' },
+            { "queue", no_argument,        nullptr, 'q' },
+            { "stack", no_argument,        nullptr, 's' },
+            { "output", required_argument, nullptr, 'o' },
+            { nullptr, 0,                  nullptr, '\0' }
+        };
+        while ((choice = getopt_long(argc, argv, "hqso:", long_options,
+            &option_index)) != -1) {
+            switch (choice) {
+            case 'h':
+                printHelp(argv);
+                exit(0);
+
+            case 'q':
+                cout << "case q\n";
+                if (mode == "stack") {
+                    cerr << "there may only be one output mode!!\n";
+                    exit(1);
+                }
+                mode = "queue";
+                break;
+
+            case 's':
+                cout << "case s\n";
+                if (mode == "queue") {
+                    cerr << "there may only be one output mode!!\n";
+                    exit(1);
+                }
+                mode = "stack";
+                break;
+
+            case 'o':
+                type = optarg;
+                cout << "case o\n";
+                if (type != "map" && type != "list") {
+                    cerr << "Error: invalid type for output type" << type << "\n";
+                    exit(1);
+                } // if
+                modeSpecified = true;
+                break;
+
+            default:
+                cerr << "Error: invalid option" << endl;
+                exit(1);
+            } // switch
+        } // while
+        if (mode != "stack" && mode != "queue") {
+            cerr << "mode was never assigned to stack or queue\n";
+            exit(1);
+        }
+
+        if (!modeSpecified) {
+            cerr << "Error: no mode specified" << endl;
+            exit(1);
+        } // if
+
+        return mode;
+
+    } // getoptPrep() 
+    /////////////////////////////////////////////////////////////////////////
     void inputCheck() {
         if (colors < 0 || colors > 26) {
             cerr << "too few or too many colors\n";
@@ -73,7 +150,7 @@ public:
             puzzle[i] = (row);
         } // for i
     }
-
+    /////////////////////////////////////////////////////////////////////////
     void print2DVector() { // For debugging purposes only
         for (int i = 0; i < puzzle.size(); i++) {
             for (int j = 0; j < puzzle[i].size(); j++) {
@@ -110,7 +187,6 @@ public:
         }
         return false;
     }
-   
     bool checkNorth(State current) {
         char north = puzzle[current.row - 1][current.col];
         if (current.row == 0 || (!isValidCharacter(north))) {
@@ -155,19 +231,91 @@ public:
         }
         return false;
     }
-    void solutionFinder() {
-        deque<State> deck;
-        State current = findStart();
-        deck.push_back(current);
-        current = deck.front();
-        deck.pop_front();
+    bool findQuestionMark(char space) {
+        if (space == '?') return true;
+        return false;
+    }
+    void checkDirectionAndPush(State current) {
         State temp;
         if (checkNorth(current)) {
             temp.col = current.col;
             temp.row = current.row - 1;
             temp.color = current.color;
-            deck.push_back(temp);
+            reachable.push_back(temp);
+            if (findQuestionMark(puzzle[current.col][current.row - 1])) {
+                end = true;
+                return;
+            }
+        }
+        if (checkEast(current)) {
+            temp.col = current.col + 1;
+            temp.row = current.row;
+            temp.color = current.color;
+            reachable.push_back(temp);
+            if (findQuestionMark(puzzle[current.col + 1][current.row])) {
+                end = true;
+                return;
+            }
+        }
+        if (checkSouth(current)) {
+            temp.col = current.col;
+            temp.row = current.row + 1;
+            temp.color = current.color;
+            reachable.push_back(temp);
+            if (findQuestionMark(puzzle[current.col][current.row + 1])) {
+                end = true;
+                return;
+            }
+        }
+        if (checkWest(current)) {
+            temp.col = current.col - 1;
+            temp.row = current.row;
+            temp.color = current.color;
+            reachable.push_back(temp);
+            if (findQuestionMark(puzzle[current.col - 1][current.row])) {
+                end = true;
+                return;
+            }
         }
     }
+    bool isLetter(char spot) {
+        if (char2Int(spot) > 96 && char2Int(spot) < 123) {
+            return true;
+        }
+        return false;
+    }
+    bool isButton(State current) {
+        if ((isLetter(puzzle[current.col][current.row]) || 
+            puzzle[current.col][current.row] == '^') &&
+            puzzle[current.col][current.row] != current.color) {
+            return true;
+        }
+        return false;
+    }
+    bool findInReachable(State current) {
+        for (int i = 0; i < reachable.size(); ++i) {
+            if (reachable[i].col == current.col &&
+                reachable[i].row == current.row &&
+                reachable[i].color == current.color) {
+                return true;
+            }
+            return false;
+        }
+    }
+    void solutionFinder() {
+        State current = findStart();
+        reachable.push_back(current);
+        while (!reachable.empty()) {
+            current = reachable.front();
+            reachable.pop_front();
+            if (isButton(current) && !findInReachable(current)) {
+
+            }
+        }
+
+        
+    }
+    ///////////////////////////////////////////////////////////////////////////
     void writeOutput();
+    ///////////////////////////////////////////////////////////////////////////
 };
