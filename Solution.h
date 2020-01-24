@@ -26,6 +26,9 @@ private:
     vector < vector<char>> puzzle;
     vector < vector < vector <char>>> backtrack;
     deque<State> reachable;
+    vector<State> answer;
+    State finalLocation;
+    State beginLocation;
 public:
     /*Solution(int color_in, int height_in, int width_in) {
         colors = color_in;
@@ -61,7 +64,6 @@ public:
                 exit(0);
 
             case 'q':
-                cout << "case q\n";
                 if (mode == "stack") {
                     cerr << "there may only be one output mode!!\n";
                     exit(1);
@@ -70,7 +72,6 @@ public:
                 break;
 
             case 's':
-                cout << "case s\n";
                 if (mode == "queue") {
                     cerr << "there may only be one output mode!!\n";
                     exit(1);
@@ -80,7 +81,6 @@ public:
 
             case 'o':
                 type = optarg;
-                cout << "case o\n";
                 if (type != "map" && type != "list") {
                     cerr << "Error: invalid type for output type" << type << "\n";
                     exit(1);
@@ -108,7 +108,7 @@ public:
     } // getoptPrep() 
     /////////////////////////////////////////////////////////////////////////
     void inputCheck() {
-        if (colors < 0 || colors > 26) {
+        if ((int)colors < 0 || (int)colors > 26) {
             cerr << "too few or too many colors\n";
             exit(1);
         }
@@ -120,14 +120,6 @@ public:
     void readJunk() {
         string junk;
         getline(cin, junk);
-    }
-    void resize2dVec(vector<vector<int>> &vec, int rows, int cols)
-    {
-        vec.resize(rows);
-        for (auto &it : vec)
-        {
-            it.resize(cols);
-        }
     }
     void readInput() {
         cin >> colors;
@@ -148,7 +140,7 @@ public:
             cin >> symbol_in;
         } // while
         int temp = -1;
-        for (int i = 1; i < width; ++i) {
+        for (unsigned int i = 1; i < width; ++i) {
             row[i - 1] = symbol_in;
             cin >> symbol_in;
             temp = i;
@@ -156,8 +148,8 @@ public:
         row[temp] = (symbol_in);
         puzzle[0] = (row);
         // Reads in the rest of the initial puzzle
-        for (int i = 1; i < height; ++i) {
-            for (int j = 0; j < width; ++j) {
+        for (unsigned int i = 1; i < height; ++i) {
+            for (unsigned int j = 0; j < width; ++j) {
                 cin >> symbol_in;
                 row[j] = (symbol_in);
             } // for j
@@ -165,14 +157,6 @@ public:
         } // for i
     }
     /////////////////////////////////////////////////////////////////////////
-    void print2DVector() { // For debugging purposes only
-        for (int i = 0; i < puzzle.size(); i++) {
-            for (int j = 0; j < puzzle[i].size(); j++) {
-                cout << puzzle[i][j] << " ";
-            }
-            cout << endl;
-        }
-    }
     int char2Int(char c) {
         if (c == '^') {
             return 0;
@@ -180,15 +164,15 @@ public:
         return (c - 'a') + 1;
     }
     char int2Char(int color) {
-        if (color == 94) {
+        if (color == 0) {
             return '^';
         }
         return (color + 'a') - 1;
     }
     State findStart() {
         State found;
-        for (int i = 0; i < height; ++i) {
-            for (int j = 0; j < width; ++j) {
+        for (unsigned int i = 0; i < height; ++i) {
+            for (unsigned int j = 0; j < width; ++j) {
                 if (puzzle[i][j] == '@') {
                     found.color = '^';
                     found.row = i;
@@ -212,13 +196,12 @@ public:
             return false;
         }
         char north = puzzle[current.row - 1][current.col];
+        int northInt = char2Int(north);
         if (!isValidCharacter(north)) {
             return false;
         }
-        if ((char2Int(north) > 0 && char2Int(north) < 27 || (char2Int(north)
-        > -32 && char2Int(north) < -5)) && (char2Int(north) - 32 == 
-            char2Int(current.color)) || char2Int(north) - 32 ==
-            char2Int(current.color)) {
+        if (((northInt > 0 && northInt < 27) && (northInt - 32 != char2Int(current.color))) ||
+            ((northInt > -32 && northInt < -5) && (northInt + 32 == char2Int(current.color)))) {
             if (backtrack[char2Int(current.color)][current.row - 1][current.col] != '.') {
                 return false;
             }
@@ -233,17 +216,16 @@ public:
         return false;
     }
     bool checkEast(State current) {
-        if (current.col == width - 1) {
+        if (current.col == (int)width - 1) {
             return false;
         }
         char east = puzzle[current.row][current.col + 1];
+        int eastInt = char2Int(east);
         if (!isValidCharacter(east)) {
             return false;
         }
-        if ((char2Int(east) > 0 && char2Int(east) < 27 || (char2Int(east)
-        > -32 && char2Int(east) < -5)) && (char2Int(east) - 32 == 
-            char2Int(current.color) || char2Int(east) - 32 ==
-            char2Int(current.color))) {
+        if (((eastInt > 0 && eastInt < 27) && (eastInt - 32 != char2Int(current.color))) ||
+            ((eastInt > -32 && eastInt < -5) && (eastInt + 32 == char2Int(current.color)))) {
             if (backtrack[char2Int(current.color)][current.row][current.col + 1] != '.') {
                 return false;
             }
@@ -258,17 +240,16 @@ public:
         return false;
     }
     bool checkSouth(State current) {
-        if (current.row == height - 1) {
+        if (current.row == (int)height - 1) {
             return false;
         }
         char south = puzzle[current.row + 1][current.col];
+        int southInt = char2Int(south);
         if (!isValidCharacter(south)) {
             return false;
         }
-        if (((char2Int(south) > 0 && char2Int(south) < 27) || (char2Int(south) 
-        > -32 && char2Int(south) < -5)) && (char2Int(south) - 32 == 
-            char2Int(current.color) || char2Int(south) + 32 ==
-            char2Int(current.color))) {
+        if (((southInt > 0 && southInt < 27) && (southInt - 32 != char2Int(current.color))) ||
+            ((southInt > -32 && southInt < -5) && (southInt + 32 == char2Int(current.color)))) {
             if (backtrack[char2Int(current.color)][current.row + 1][current.col] != '.') {
                 return false;
             }
@@ -287,13 +268,12 @@ public:
             return false;
         }
         char west = puzzle[current.row][current.col - 1];
+        int westInt = char2Int(west);
         if (!isValidCharacter(west)) {
             return false;
         }
-        if ((char2Int(west) > 0 && char2Int(west) < 27 || (char2Int(west)
-        > -32 && char2Int(west) < -5)) && (char2Int(west) - 32 != 
-            char2Int(current.color) || char2Int(west) + 32 ==
-            char2Int(current.color))) {
+        if (((westInt > 0 && westInt < 27) && (westInt - 32 != char2Int(current.color))) ||
+            ((westInt > -32 && westInt < -5) && (westInt + 32 == char2Int(current.color)))) {
             if (backtrack[char2Int(current.color)][current.row][current.col - 1] != '.') {
                 return false;
             }
@@ -322,6 +302,7 @@ public:
                 'S';
             if (findQuestionMark(puzzle[current.row - 1][current.col])) {
                 end = true;
+                finalLocation = temp;
                 return;
             }
         }
@@ -334,6 +315,7 @@ public:
                 'W';
             if (findQuestionMark(puzzle[current.row][current.col + 1])) {
                 end = true;
+                finalLocation = temp;
                 return;
             }
         }
@@ -346,6 +328,7 @@ public:
                 'N';
             if (findQuestionMark(puzzle[current.row + 1][current.col])) {
                 end = true;
+                finalLocation = temp;
                 return;
             }
         }
@@ -358,6 +341,7 @@ public:
                 'E';
             if (findQuestionMark(puzzle[current.row][current.col - 1])) {
                 end = true;
+                finalLocation = temp;
                 return;
             }
         }
@@ -377,7 +361,7 @@ public:
         return false;
     }
     bool findInReachable(State current) {
-        for (int i = 0; i < reachable.size(); ++i) {
+        for (unsigned int i = 0; i < reachable.size(); ++i) {
             if (reachable[i].col == current.col &&
                 reachable[i].row == current.row &&
                 reachable[i].color == current.color) {
@@ -385,36 +369,188 @@ public:
             }
             return false;
         }
+        return false;
+    }
+    bool isReached(int row, int col) {
+        for (int i = 0; i < colors + 1; ++i) {
+            if (backtrack[i][row][col] != '.') {
+                return true;
+            }
+        }
+        return false;
+    }
+    void printReachable() {
+        /*for (int i = 0; i < colors + 1; ++i) {
+            for (int j = 0; j < height; ++j) {
+                for (int k = 0; k < width; ++k) {
+
+                }
+            }
+        }*/
+        for (int i = 0; i < height; ++i) {
+            for (int j = 0; j < width; ++j) {
+                if (isReached(i, j)) {
+                    cout << puzzle[i][j];
+                }
+                else {
+                    cout << '#';
+                }
+            }
+            cout << endl;
+        }
+        
     }
     void solutionFinder() {
         State current = findStart();
+        beginLocation = current;
         State tempState;
         reachable.push_back(current);
+        backtrack[char2Int('^')][current.row][current.col] = '@';
         while (!reachable.empty()) {
             if (!end) {
-                current = reachable.front();
+                
                 if (mode == "queue") {
+                    current = reachable.front();
                     reachable.pop_front();
                 }
-                reachable.pop_back();
+                else {
+                    current = reachable.back();
+                    reachable.pop_back();
+                }
                 if (isButton(current) && !findInReachable(current)) {
                     tempState.color = puzzle[current.row][current.col];
                     tempState.col = current.col;
                     tempState.row = current.row;
                     reachable.push_back(tempState);
                     backtrack[char2Int(tempState.color)][current.row][current.col] 
-                        = tempState.color;
+                        = current.color;
                 }
                 checkDirectionAndPush(current);
             }
             else {
-                break;
+                current = reachable.back();
+                reachable.clear();
             }
+        }
+        if (!end) {
+            cout << "No solution.\nReachable:\n";
+            printReachable();
+            exit(0);
         }
         // do stuff
         
     }
     ///////////////////////////////////////////////////////////////////////////
-    void writeOutput();
+    bool statesEqual(State lhs, State rhs) {
+        if (lhs.col == rhs.col &&
+            lhs.row == rhs.row &&
+            lhs.color == rhs.color) {
+            return true;
+        }
+        return false;
+    }
+    void fillSolutionVector() {
+        State current = finalLocation;
+        State finish = findStart();
+        while (!statesEqual(current, finish)) {
+            answer.push_back(current);
+            char checker = backtrack[char2Int(current.color)][current.row][current.col];
+            if (checker == 'N') {
+                current.row -= 1;
+            }
+            else if (checker == 'E') {
+                current.col += 1;
+            }
+            else if (checker == 'S') {
+                current.row += 1;
+            }
+            else if (checker == 'W') {
+                current.col -= 1;
+            }
+            else {
+                current.color = 
+                    backtrack[char2Int(current.color)][current.row][current.col];
+            }
+        }
+        answer.push_back(beginLocation);
+    }
+    void printListOutput() {
+        for (size_t i = answer.size() - 1; i > 0; --i) {
+            cout << "(" << answer[i].color << ", (" << answer[i].row << ", " 
+                << answer[i].col << "))\n";
+        }
+    }
+    bool findInAnswer(State question) {
+        for (int i = 0; i < answer.size(); ++i) {
+            char temp = 
+                (backtrack[char2Int(question.color)][question.row][question.col]);
+            if (question.color == answer[i].color &&
+                question.row == answer[i].row &&
+                question.col == answer[i].col) {
+                return true;
+            }
+        }
+        return false;
+    }
+    bool thisFloor(char spot, int color) {
+        if (spot == int2Char(color) || spot == int2Char(color - 32)) {
+            return true;
+        }
+        return false;
+    }
+    void printAlteredMap(int color) {
+        State temp = beginLocation;
+        char spot;
+        for (int i = 0; i < height; ++i) {
+            for (int j = 0; j < width; ++j) {
+                spot = puzzle[temp.row][temp.col];
+                if (findInAnswer(temp)) {
+                    if (isButton(temp)) {
+                        cout << '%';
+                    }
+                    else if (spot == '@') {
+                        cout << '@';
+                    }
+                    else if (spot == '?') {
+                        cout << '?';
+                    }
+                    else {
+                        cout << '+';
+                    }
+                }
+                else {
+                    if (thisFloor(spot, color)) {
+                        cout << '.';
+                    }
+                    else {
+                        cout << spot;
+                    }
+                }
+                temp.col += 1;
+            }
+            cout << '\n';
+            temp.row += 1;
+            temp.col = 0;
+            if (temp.row != height) {
+                spot = puzzle[temp.row][temp.col];
+            }
+        }
+    }
+    void printMapOutput() {
+        for (int i = 0; i < colors + 1; ++i) {
+            cout << "// color " << int2Char(i) << '\n';
+            printAlteredMap(i);
+        }
+    }
+    void writeOutput() {
+        if (type == "list") {
+            fillSolutionVector();
+            printListOutput();
+        }
+        else {
+            fillSolutionVector();
+            printMapOutput();
+        }
+    }
     ///////////////////////////////////////////////////////////////////////////
 };

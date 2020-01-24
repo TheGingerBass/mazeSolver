@@ -1,5 +1,5 @@
 ## EECS 281 Advanced Makefile
-
+# Noah Bonello
 # How to use this Makefile...
 ###################
 ###################
@@ -16,6 +16,10 @@
 #      specified in the PROJECTFILE variable.
 #   3. Files you want to include in your final submission cannot match the
 #      test*.cpp pattern.
+
+PATH := /usr/um/gcc-6.2.0/bin:$(PATH)
+LD_LIBRARY_PATH := usr/um/gcc-6.2.0/lib64
+LD_RUN_PATH := usr/um/gcc-6.2.0/lib64
 
 #######################
 # TODO (begin) #
@@ -268,7 +272,7 @@ help:
 #
 # ADD YOUR OWN DEPENDENCIES HERE
 
-project1.o: project1.cpp Maze.h
+# project1.o: project1.cpp Maze.h
 
 ######################
 # TODO (end) #

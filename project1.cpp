@@ -6,11 +6,9 @@
 int main(int argc, char * argv[]) {
     ios_base::sync_with_stdio(false);
     Solution s;
-    string mode = s.getoptPrep(argc, argv);
+    s.getoptPrep(argc, argv);
     s.readInput();
-    s.print2DVector();
     s.solutionFinder();
-    //s.writeOutput();
+    s.writeOutput();
     return 0;
 }
-
