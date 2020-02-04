@@ -37,6 +37,51 @@
     <Text Include="test-4-sq.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="test-2-sq.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="test-3-sl.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="test-5-sl.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="test-6-sq.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="test-7-sq.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="test-8-sq.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="test-10-sq.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="test-11-sl.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="test-12-sq.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="test-13-sl.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="test-14-sq.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="test-9-qm.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="givenTests\big.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="myBigOut.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="small.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Solution.h">

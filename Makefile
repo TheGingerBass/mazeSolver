@@ -273,6 +273,7 @@ help:
 # ADD YOUR OWN DEPENDENCIES HERE
 
 # project1.o: project1.cpp Maze.h
+project1.o: project1.cpp Solution.h
 
 ######################
 # TODO (end) #

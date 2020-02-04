@@ -1,0 +1,6 @@
+No solution.
+Reachable:
+@..A..b
+.a.#B##
+####...
+####.^^

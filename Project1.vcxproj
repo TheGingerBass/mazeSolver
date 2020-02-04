@@ -125,9 +125,24 @@
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="givenTests\big.txt" />
+    <Text Include="myBigOut.txt" />
+    <Text Include="small.txt" />
     <Text Include="test-1-sl.txt" />
+    <Text Include="test-10-sq.txt" />
+    <Text Include="test-11-sl.txt" />
+    <Text Include="test-12-sq.txt" />
+    <Text Include="test-13-sl.txt" />
+    <Text Include="test-14-sq.txt" />
     <Text Include="test-15-sl.txt" />
+    <Text Include="test-2-sq.txt" />
+    <Text Include="test-3-sl.txt" />
     <Text Include="test-4-sq.txt" />
+    <Text Include="test-5-sl.txt" />
+    <Text Include="test-6-sq.txt" />
+    <Text Include="test-7-sq.txt" />
+    <Text Include="test-8-sq.txt" />
+    <Text Include="test-9-qm.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
