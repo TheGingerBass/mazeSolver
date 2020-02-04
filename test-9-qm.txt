@@ -1,17 +1,7 @@
-3 11 11
+3 1 2
 // Project Identifier: A8A3A33EF075ACEF9B08F5B9845569ECCB423725
 // Noah Bonello
 // Example levels
 // 3 colors (A, B, C)
 // 11x11 grid
-###########
-#...@.#.?.#
-#.^...B...#
-#.^^^######
-#....a....#
-#B#.......#
-#bC...#B#C#
-###A###.#.#
-#....B.c#C#
-#b...##.C.#
-###########
+?@

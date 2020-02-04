@@ -518,11 +518,16 @@ public:
         cout << "(" << ope.color << ", (" << ope.row << ", " << ope.col << 
         "))" << endl;
     }
-    void replaceSpot(State spot) {
+    void replaceSpot(State spot, bool yeet) {
+        if (yeet) {
+            backtrack[char2Int(spot.color)][spot.row][spot.col]
+                = '@';
+            return;
+        }
         if (isButtonBacktrack(spot)) {
             if (puzzle[spot.row][spot.col] == spot.color) {
                 backtrack[char2Int(spot.color)][spot.row][spot.col] 
-                    = '@';
+                    = '+';
                 return;
             }
             backtrack[char2Int(spot.color)][spot.row][spot.col] = '%';
@@ -548,28 +553,25 @@ public:
             char checker = backtrack[char2Int(current.color)][current.row][current.col];
             answer.push_back(current);
             if (checker == 'N') {
-                replaceSpot(current);
+                replaceSpot(current, false);
                 current.row -= 1;
             }
             else if (checker == 'E') {
-                replaceSpot(current);
+                replaceSpot(current, false);
                 current.col += 1;
             }
             else if (checker == 'S') {
-                replaceSpot(current);
+                replaceSpot(current, false);
                 current.row += 1;
             }
             else if (checker == 'W') {
-                replaceSpot(current);
+                replaceSpot(current, false);
                 current.col -= 1;
             }
             else {
-
                 nextColor = backtrack[char2Int(current.color)][current.row][current.col];
-                replaceSpot(current);
-                current.color =
-                    nextColor;
-                
+                replaceSpot(current, true);
+                current.color = nextColor;
             }
         }
         answer.push_back(beginLocation);
